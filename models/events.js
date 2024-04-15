@@ -4,7 +4,7 @@ const eventSchema = mongoose.Schema({
   title: String,
   date: Date,
   address: String,
-  category: String,
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'categories'},
   description: String,
   numberOfSeats: Number,
 });
