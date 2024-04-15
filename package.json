@@ -6,12 +6,17 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.3",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^16.4.5",
     "express": "~4.16.1",
     "mongoose": "^8.3.1",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "persist": "^0.2.7",
+    "react-redux": "^9.1.1",
+    "redux": "^5.0.1",
+    "uid2": "^1.0.0"
   }
 }
