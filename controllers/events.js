@@ -87,8 +87,10 @@ exports.deleteEvent = (req, res) => {
     // Vérification du token utilisateur
     User.findOne({ token: req.params.token }).then(user => {
       if (user) {
-  
-        Event.findById(req.params.id)
+        // Suppression de l'event
+        Event.deleteOne({ _id: req.params.id }).then(() => {
+            res.json({ result: true });
+        })
   
       } else {
         res.json({ result: false, error: 'User not found' });
@@ -98,5 +100,16 @@ exports.deleteEvent = (req, res) => {
 
 // Modifier un event
 exports.updateEvent = (req, res) => {
+    // Vérification du token utilisateur
+    User.findOne({ token: req.params.token }).then(user => {
+        if (user) {
 
+            Event.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id}).then(() => {
+                res.json({ result: true });
+            })
+
+        } else {
+            res.json({ result: false, error: 'User not found' });
+        }
+    })
 };
