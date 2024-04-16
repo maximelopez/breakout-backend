@@ -3,7 +3,7 @@ const User = require('../models/users');
 const bcrypt = require('bcrypt');
 const uid2 = require('uid2');
 
-const signup = (req, res) => {
+exports.signup = (req, res) => {
     if (req.body.firstname && req.body.email && req.body.password) {
         // Vérifier si l'utilisateur existe déjà
         User.findOne({ email: req.body.email }).then(user => {
@@ -33,7 +33,7 @@ const signup = (req, res) => {
 }
 
 
-const signin = (req, res) => {
+exports.signin = (req, res) => {
     if (req.body.email && req.body.password) {
 
         User.findOne({ email: req.body.email }).then(user => {
@@ -55,5 +55,3 @@ const signin = (req, res) => {
         res.json({ result: false, error: 'Missing or empty fields' });
     }
 }
-
-module.exports = { signup, signin };

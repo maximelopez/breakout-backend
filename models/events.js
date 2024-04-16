@@ -7,7 +7,7 @@ const eventSchema = mongoose.Schema({
   address: String,
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'categories'},
   description: String,
-  numberOfSeats: Number,
+  seats: Number,
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
 });
 
