@@ -17,6 +17,9 @@ const signup = (req, res) => {
                     email: req.body.email,
                     password: hash,
                     token: uid2(32),
+                    avatar: '',
+                    favoriteCategories: [],
+                    likedEvents: [],
                 });
 
                 newUser.save().then(user => {
