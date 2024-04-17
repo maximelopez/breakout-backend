@@ -8,5 +8,6 @@ router.get('/all/:token', eventsCtrl.getAllEvents);
 router.get('/:token/:id', eventsCtrl.getEvent);
 router.delete('/:token/:id', eventsCtrl.deleteEvent);
 router.put('/:token/:id', eventsCtrl.updateEvent);
+router.put('/signup/:token/:id', eventsCtrl.signupEvent);
 
 module.exports = router;

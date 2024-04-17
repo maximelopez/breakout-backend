@@ -113,3 +113,33 @@ exports.updateEvent = (req, res) => {
         }
     })
 };
+
+
+// S'inscrire à un event
+exports.signupEvent = (req, res) => {
+    User.findOne({ token: req.params.token }).then(user => {
+      if (user) {
+
+        Event.findById(req.params.id).then(event => {
+          if (event) {
+            // Vérifier si l'utilisateur est déjà inscrit
+            if (event.participants.includes(user._id)) {
+              // L'utilisateur est déjà inscrit
+              res.json({ result: false, error: 'Utilisateur déjà inscrit à cet event.' });
+            } else {
+              // L'utilisateur n'est pas encore inscrit, inscription à l'event
+              Event.updateOne({ _id: req.params.id }, { $push: { participants: user._id } }).then(() => {
+                res.json({ result: true });
+              });
+            }
+
+          } else {
+            res.json({ result: false, error: 'Event not found' });
+          }
+        })
+
+      } else {
+        res.json({ result: false, error: 'User not found' });
+      }
+    })
+};
