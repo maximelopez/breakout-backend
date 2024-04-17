@@ -65,30 +65,47 @@ exports.signin = (req, res) => {
   }
 };
 
-//Trial delete account//
+// //Trial delete account//
+// exports.remove = (req, res) => {
+//   //Authentification ?//
+//   if (req.body.email && req.body.password) {
+//     User.findOne({ email: req.body.email }).then((user) => {
+//       if (user) {
+//         // Verifie password
+//         if (bcrypt.compareSync(req.body.password, user.password)) {
+//           // Suppression si password correspond
+//           User.deleteOne({ _id: user._id })
+//             .then(() => {
+//               res.json({
+//                 result: true,
+//                 message: "Account deleted successfully",
+//               });
+//             })
+//             .catch((error) => {
+//               res.json({ result: false, error: "Error deleting account" });
+//             });
+//         } else {
+//           // Sinon, retourne erreur
+//           res.json({ result: false, error: "Incorrect password" });
+//         }
+//       }
+//     });
+//   }
+// };
+
+// Supprimer un compte
 exports.remove = (req, res) => {
-  //Authentification ?//
-  if (req.body.email && req.body.password) {
-    User.findOne({ email: req.body.email }).then((user) => {
-      if (user) {
-        // Verifie password
-        if (bcrypt.compareSync(req.body.password, user.password)) {
-          // Suppression si password correspond
-          User.deleteOne({ _id: user._id })
-            .then(() => {
-              res.json({
-                result: true,
-                message: "Account deleted successfully",
-              });
-            })
-            .catch((error) => {
-              res.json({ result: false, error: "Error deleting account" });
-            });
-        } else {
-          // Sinon, retourne erreur
-          res.json({ result: false, error: "Incorrect password" });
-        }
-      }
-    });
-  }
+  // Vérification du token utilisateur
+  User.findOne({
+    token: req.params.token,
+  }).then((user) => {
+    if (user) {
+      // Suppression du compte
+      User.deleteOne({ _id: user._id }).then(() => {
+        res.json({ result: true, message: "Utilisateur supprimé" });
+      });
+    } else {
+      res.json({ result: false, error: "Utilisateur non trouvé" });
+    }
+  });
 };
