@@ -2,7 +2,7 @@ const Event = require("../models/events");
 const User = require("../models/users");
 const Category = require("../models/categories");
 
-// Créer un event
+
 exports.postEvent = (req, res) => {
     // Vérification des champs
     if (req.body.token && req.body.category && req.body.title && req.body.selectedDate && req.body.address && req.body.description && req.body.seats) {
@@ -45,7 +45,7 @@ exports.postEvent = (req, res) => {
     }
 };
 
-// Récupérer tous les events
+
 exports.getAllEvents = (req, res) => {
     User.findOne({ token: req.params.token }).then(user => {
       if (user) {
@@ -63,7 +63,7 @@ exports.getAllEvents = (req, res) => {
     });
 };
 
-// Récupérer un event
+
 exports.getEvent = (req, res) => {
     // Vérification du token utilisateur
     User.findOne({ token: req.params.token }).then(user => {
@@ -82,13 +82,15 @@ exports.getEvent = (req, res) => {
     })
 };
 
-// Supprimer un event
+
 exports.deleteEvent = (req, res) => {
     // Vérification du token utilisateur
     User.findOne({ token: req.params.token }).then(user => {
       if (user) {
-  
-        Event.findById(req.params.id)
+        // Suppression de l'event
+        Event.deleteOne({ _id: req.params.id }).then(() => {
+            res.json({ result: true });
+        })
   
       } else {
         res.json({ result: false, error: 'User not found' });
@@ -96,7 +98,93 @@ exports.deleteEvent = (req, res) => {
     })
 };
 
-// Modifier un event
-exports.updateEvent = (req, res) => {
 
+exports.updateEvent = (req, res) => {
+    // Vérification du token utilisateur
+    User.findOne({ token: req.params.token }).then(user => {
+        if (user) {
+
+            Event.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id}).then(() => {
+                res.json({ result: true });
+            })
+
+        } else {
+            res.json({ result: false, error: 'User not found' });
+        }
+    })
 };
+
+
+
+exports.signupEvent = (req, res) => {
+    User.findOne({ token: req.params.token }).then(user => {
+      if (user) {
+
+        Event.findById(req.params.id).then(event => {
+          if (event) {
+            // Vérifier si l'utilisateur est déjà inscrit
+            if (event.participants.includes(user._id)) {
+              // L'utilisateur est déjà inscrit
+              res.json({ result: false, error: 'Utilisateur déjà inscrit à cet event.' });
+            } else {
+              // L'utilisateur n'est pas encore inscrit, inscription à l'event
+              Event.updateOne({ _id: req.params.id }, { $push: { participants: user._id } }).then(() => {
+                res.json({ result: true });
+              });
+            }
+
+          } else {
+            res.json({ result: false, error: 'Event not found' });
+          }
+        })
+
+      } else {
+        res.json({ result: false, error: 'User not found' });
+      }
+    })
+};
+
+
+exports.getMyEvents = (req, res) => {
+  User.findOne({ token: req.params.token }).then(user => {
+    if (user) {
+
+      Event.find({ participants: { $in: [user._id] } })
+        .populate('creator', ['firstname', 'email', 'avatar'])
+        .populate('category', ['name', 'description'])
+        .then(events => {
+          if (events[0]) {
+            res.json({ result: true, events: events });
+          } else {
+            res.json({ result: false, error: 'Events not found' });
+          }
+        });
+
+    } else {
+        res.json({ result: false, error: 'User not found' });
+    }
+  })
+};
+
+
+exports.getMyEventsCreated = (req, res) => {
+  console.log('hello')
+  User.findOne({ token: req.params.token }).then(user => {
+    if (user) {
+
+      Event.find({ creator: user._id })
+        .populate('creator', ['firstname', 'email', 'avatar'])
+        .populate('category', ['name', 'description'])
+        .then(events => {
+          if (events[0]) {
+            res.json({ result: true, events: events });
+          } else {
+            res.json({ result: false, error: 'Events not found' });
+          }
+        });
+
+    } else {
+      res.json({ result: false, error: 'User not found' });
+    }
+  })
+}
