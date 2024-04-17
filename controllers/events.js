@@ -165,3 +165,26 @@ exports.getMyEvents = (req, res) => {
     }
   })
 };
+
+
+exports.getMyEventsCreated = (req, res) => {
+  console.log('hello')
+  User.findOne({ token: req.params.token }).then(user => {
+    if (user) {
+
+      Event.find({ creator: user._id })
+        .populate('creator', ['firstname', 'email', 'avatar'])
+        .populate('category', ['name', 'description'])
+        .then(events => {
+          if (events[0]) {
+            res.json({ result: true, events: events });
+          } else {
+            res.json({ result: false, error: 'Events not found' });
+          }
+        });
+
+    } else {
+      res.json({ result: false, error: 'User not found' });
+    }
+  })
+}
