@@ -109,3 +109,47 @@ exports.remove = (req, res) => {
     }
   });
 };
+
+exports.modify = (req, res) => {
+  // checking user token
+  User.findOne({
+    token: req.params.token,
+  }).then((user) => {
+    if (user) {
+      // updating user data
+      User.updateOne(
+        { token: user.token },
+        {
+          $set: { avatar: req.body.avatar, dateOfBirth: req.body.dateOfBirth },
+          $currentDate: { lastModified: true },
+        }
+      ).then(() => {
+        res.json({
+          result: true,
+          avatar: req.body.avatar,
+          // favoriteCategories: req.body.favoriteCategories,
+          dateOfBirth: req.body.dateOfBirth,
+        });
+      });
+    } else {
+      res.json({ result: false, error: "Utilisateur non trouvé" });
+    }
+  });
+};
+
+exports.print = (req, res) => {
+  // checking user token
+  User.findOne({
+    token: req.params.token,
+  }).then((user) => {
+    if (user) {
+      // reading user data
+      res.json({
+        result: true,
+        user,
+      });
+    } else {
+      res.json({ result: false, error: "Utilisateur non trouvé" });
+    }
+  });
+};
