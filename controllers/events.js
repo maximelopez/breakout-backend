@@ -116,7 +116,7 @@ exports.updateEvent = (req, res) => {
 
 
 
-exports.signupEvent = (req, res) => {
+exports.registerEvent = (req, res) => {
     User.findOne({ token: req.params.token }).then(user => {
       if (user) {
 
@@ -142,6 +142,34 @@ exports.signupEvent = (req, res) => {
         res.json({ result: false, error: 'User not found' });
       }
     })
+};
+
+exports.unregisterEvent = (req, res) => {
+  User.findOne({ token: req.params.token }).then(user => {
+    if (user) {
+
+      Event.findById(req.params.id).then(event => {
+        if (event) {
+          // Vérifier si l'utilisateur est inscrit à l'event
+          if (event.participants.includes(user._id)) {
+            // L'utilisateur est inscrit, on le désinscrit
+            Event.updateOne({ _id: req.params.id }, { $pull: { participants: user._id } }).then(() => {
+              res.json({ result: true });
+            })
+          } else {
+            // L'utilisateur n'est pas inscrit
+            res.json({ result: false, error: 'Utilisateur n\'est pas inscrit à cet event.' });
+          }
+
+        } else {
+            res.json({ result: false, error: 'Event not found' });
+        }
+      })
+
+    } else {
+      res.json({ result: false, error: 'User not found' });
+    }
+  })
 };
 
 

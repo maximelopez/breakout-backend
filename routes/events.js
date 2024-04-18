@@ -19,10 +19,13 @@ router.delete('/:token/:id', eventsCtrl.deleteEvent);
 router.put('/:token/:id', eventsCtrl.updateEvent);
 
 // Inscrire un user à un event
-router.put('/signup/:token/:id', eventsCtrl.signupEvent);
+router.put('/register/:token/:id', eventsCtrl.registerEvent);
+
+// Désinscrire un user d'un event
+router.put('/unregister/:token/:id',  eventsCtrl.unregisterEvent);
 
 // Récupérer tous les events où un user est inscrit
-router.get('/signup/:token', eventsCtrl.getMyEvents);
+router.get('/register/:token', eventsCtrl.getMyEvents);
 
 // Récupérer tous les events crées par un user
 router.get('/created/:token', eventsCtrl.getMyEventsCreated);
