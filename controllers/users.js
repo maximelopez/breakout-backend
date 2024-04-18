@@ -145,10 +145,17 @@ exports.print = (req, res) => {
     token: req.params.token,
   }).then((user) => {
     if (user) {
+      let avatar = user.avatar;
+      let favoriteCategories = user.favoriteCategories;
+      let dateOfBirth = user.dateOfBirth;
+      let email = user.email;
       // reading user data
       res.json({
         result: true,
-        user,
+        avatar,
+        favoriteCategories,
+        dateOfBirth,
+        email,
       });
     } else {
       res.json({ result: false, error: "Utilisateur non trouvé" });
