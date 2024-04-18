@@ -26,6 +26,7 @@ exports.signup = (req, res) => {
           res.json({
             result: true,
             token: user.token,
+            id: user._id,
             email: user.email,
             firstname: user.firstname,
           });
@@ -47,6 +48,7 @@ exports.signin = (req, res) => {
           res.json({
             result: true,
             token: user.token,
+            id: user._id,
             email: user.email,
             firstname: user.firstname,
           });
