@@ -2,6 +2,7 @@ require("../models/connection");
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const uid2 = require("uid2");
+const Category = require("../models/categories");
 
 exports.signup = (req, res) => {
   if (req.body.firstname && req.body.email && req.body.password) {
@@ -119,19 +120,33 @@ exports.modify = (req, res) => {
   }).then((user) => {
     if (user) {
       // updating user data
-      User.updateOne(
-        { token: user.token },
-        {
-          $set: { avatar: req.body.avatar, dateOfBirth: req.body.dateOfBirth },
-          $currentDate: { lastModified: true },
+      // Récupérer l'id de la catégorie pour la clé étrangère
+      Category.findOne({ name: req.body.category }).then((categoryData) => {
+        if (categoryData) {
+          let category = categoryData._id;
+          //
+          User.updateOne(
+            { token: user.token },
+            {
+              $set: {
+                avatar: req.body.avatar,
+                dateOfBirth: req.body.dateOfBirth,
+                favoriteCategories: category,
+              },
+              $currentDate: { lastModified: true }, // ligne sert ?
+            }
+          ).then((user) => {
+            console.log(user);
+            res.json({
+              result: true,
+              // avatar: user.avatar,
+              // favoriteCategories: user.favoriteCategories,
+              // dateOfBirth: user.dateOfBirth,
+            });
+          });
+        } else {
+          res.json({ result: false, error: "Category not found" });
         }
-      ).then(() => {
-        res.json({
-          result: true,
-          avatar: req.body.avatar,
-          // favoriteCategories: req.body.favoriteCategories,
-          dateOfBirth: req.body.dateOfBirth,
-        });
       });
     } else {
       res.json({ result: false, error: "Utilisateur non trouvé" });
