@@ -72,12 +72,12 @@ exports.signin = (req, res) => {
 // exports.remove = (req, res) => {
 //   //Authentification ?//
 //   if (req.body.email && req.body.password) {
-//     User.findOne({ email: req.body.email }).then((user) => {
+//     User.findOne({ token: req.params.token }).then((user) => {
 //       if (user) {
 //         // Verifie password
 //         if (bcrypt.compareSync(req.body.password, user.password)) {
 //           // Suppression si password correspond
-//           User.deleteOne({ _id: user._id })
+//           User.deleteOne({ token: req.params.token })
 //             .then(() => {
 //               res.json({
 //                 result: true,
@@ -101,16 +101,34 @@ exports.remove = (req, res) => {
   // Vérification du token utilisateur
   User.findOne({
     token: req.params.token,
-  }).then((user) => {
-    if (user) {
-      // Suppression du compte
-      User.deleteOne({ _id: user._id }).then(() => {
-        res.json({ result: true, message: "Utilisateur supprimé" });
+  })
+    .then((user) => {
+      if (user) {
+        // Suppression du compte
+        User.deleteOne({ _id: user._id })
+          .then((result) => {
+            if (result.deletedCount > 0) {
+              res.json({ result: true, message: "Utilisateur supprimé" });
+            } else {
+              res.json({ result: false, error: "La suppression a échoué" });
+            }
+          })
+          .catch((err) => {
+            res.json({
+              result: false,
+              error: "Une erreur est survenue lors de la suppression",
+            });
+          });
+      } else {
+        res.json({ result: false, error: "Utilisateur non trouvé" });
+      }
+    })
+    .catch((err) => {
+      res.json({
+        result: false,
+        error: "Une erreur est survenue lors de la recherche de l'utilisateur",
       });
-    } else {
-      res.json({ result: false, error: "Utilisateur non trouvé" });
-    }
-  });
+    });
 };
 
 exports.modify = (req, res) => {
