@@ -9,7 +9,7 @@ exports.signup = (req, res) => {
     // Vérifier si l'utilisateur existe déjà
     User.findOne({ email: req.body.email }).then((user) => {
       if (user) {
-        res.json({ result: false, error: "User already exists" });
+        res.json({ result: false, error: "L'utilisateur existe déjà." });
       } else {
         const hash = bcrypt.hashSync(req.body.password, 10);
 
@@ -35,7 +35,7 @@ exports.signup = (req, res) => {
       }
     });
   } else {
-    res.json({ result: false, error: "Missing or empty fields" });
+    res.json({ result: false, error: "Champs manquants ou vides." });
   }
 };
 
@@ -56,11 +56,14 @@ exports.signin = (req, res) => {
         } else {
           res.json({
             result: false,
-            error: "User not found or wrong password",
+            error: "Utilisateur introuvable ou mot de passe incorrect.",
           });
         }
       } else {
-        res.json({ result: false, error: "User not found or wrong password" });
+        res.json({
+          result: false,
+          error: "Utilisateur introuvable ou mot de passe incorrect.",
+        });
       }
     });
   } else {
@@ -101,16 +104,34 @@ exports.remove = (req, res) => {
   // Vérification du token utilisateur
   User.findOne({
     token: req.params.token,
-  }).then((user) => {
-    if (user) {
-      // Suppression du compte
-      User.deleteOne({ _id: user._id }).then(() => {
-        res.json({ result: true, message: "Utilisateur supprimé" });
+  })
+    .then((user) => {
+      if (user) {
+        // Suppression du compte
+        User.deleteOne({ _id: user._id })
+          .then((result) => {
+            if (result.deletedCount > 0) {
+              res.json({ result: true, message: "Utilisateur supprimé" });
+            } else {
+              res.json({ result: false, error: "La suppression a échoué" });
+            }
+          })
+          .catch((err) => {
+            res.json({
+              result: false,
+              error: "Une erreur est survenue lors de la suppression",
+            });
+          });
+      } else {
+        res.json({ result: false, error: "Utilisateur non trouvé" });
+      }
+    })
+    .catch((err) => {
+      res.json({
+        result: false,
+        error: "Une erreur est survenue lors de la recherche de l'utilisateur",
       });
-    } else {
-      res.json({ result: false, error: "Utilisateur non trouvé" });
-    }
-  });
+    });
 };
 
 exports.modify = (req, res) => {
