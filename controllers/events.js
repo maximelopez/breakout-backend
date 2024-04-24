@@ -26,8 +26,13 @@ exports.postEvent = (req, res) => {
                 participants: [],
                 });
 
-                newEvent.save().then((event) => {
-                    res.json({ result: true, event: event });
+                newEvent.save().then((newEvent) => {
+                    Event.findOne({ _id: newEvent._id })
+                    .populate('creator', ['firstname', 'email', 'avatar'])
+                    .populate('category', ['name', 'description'])
+                    .then((event) => {
+                      res.json({ result: true, event: event });
+                    })
                 });
 
             } else {
