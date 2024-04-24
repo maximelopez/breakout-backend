@@ -8,4 +8,8 @@ router.post("/signin", usersCtrl.signin);
 router.delete("/remove/:token", usersCtrl.remove);
 router.put("/modify/:token", usersCtrl.modify);
 router.get("/print/:token", usersCtrl.print);
+
+router.put("/like/:token/:eventId", usersCtrl.likeEvent);
+router.get("/like/:token", usersCtrl.loadEvent);
+
 module.exports = router;

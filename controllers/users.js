@@ -72,6 +72,39 @@ exports.signin = (req, res) => {
   }
 };
 
+// Liker un event
+exports.likeEvent = (req, res) => {
+  User.findOne({ token: req.params.token }).then(user => {
+    if (user) {
+
+      if (user.likedEvents.includes(req.params.eventId)) {
+        User.updateOne({ token: req.params.token  }, { $pull: { likedEvents: req.params.eventId } }).then(() => {
+          res.json({ result: true, message: 'Event supprimé de la liste des likes.' })
+        })
+      } else {
+        User.updateOne({ token: req.params.token  }, { $push: { likedEvents: req.params.eventId } }).then(() => {
+          res.json({ result: true, message: 'Event ajouté à la liste des likes.' });
+        })
+      }
+
+    } else {
+      res.json({ result: false, error: 'User not found' });
+    }
+  })
+};
+
+// Récupérer les likes d'un user
+exports.loadEvent = (req, res) => {
+  User.findOne({ token: req.params.token }).then(user => {
+    if (user) {
+      res.json({ result: true, eventsLiked: user.likedEvents });
+    } else {
+      res.json({ result: false, error: 'User not found' });
+    }
+  })
+}
+
+
 // //Trial delete account//
 // exports.remove = (req, res) => {
 //   //Authentification ?//
