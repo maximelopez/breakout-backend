@@ -1,5 +1,11 @@
 require("dotenv").config();
+require("dotenv").config();
 
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const cors = require("cors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -13,6 +19,9 @@ const gpseventsRouter = require("./routes/gpsevents");
 
 const app = express();
 app.use(cors());
+
+const fileUpload = require("express-fileupload");
+app.use(fileUpload());
 
 app.use(logger("dev"));
 app.use(express.json());

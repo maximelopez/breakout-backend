@@ -4,6 +4,12 @@ const bcrypt = require("bcrypt");
 const uid2 = require("uid2");
 const Category = require("../models/categories");
 
+//Uniqid//
+const uniqid = require("uniqid");
+//Cloudinary//
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
+
 exports.signup = (req, res) => {
   if (req.body.firstname && req.body.email && req.body.password) {
     // Vérifier si l'utilisateur existe déjà
@@ -184,7 +190,6 @@ exports.modify = (req, res) => {
             { token: user.token },
             {
               $set: {
-                avatar: req.body.avatar,
                 dateOfBirth: req.body.dateOfBirth,
                 favoriteCategories: category,
               },
@@ -231,4 +236,48 @@ exports.print = (req, res) => {
       res.json({ result: false, error: "Utilisateur non trouvé" });
     }
   });
+};
+
+//Ajouter photo au profil et l'envoyer vers cloudinary//
+exports.addPicture = async (req, res) => {
+  try {
+    const files = req.files;
+    console.log("Files", files);
+
+    const photoPath = `./tmp/${uniqid()}.jpg`;
+    const resultMove = await files.avatar.mv(photoPath);
+    // console.log("PhotoPath", photoPath);
+    // console.log("ResultMove", resultMove);
+
+    if (!resultMove) {
+      const resultCloudinary = await cloudinary.uploader.upload(photoPath);
+      // console.log("resultCloudinary", resultCloudinary);
+
+      // Mettre à jour url photo dans BDD, verification token utilisateur//
+      const updatedUser = await User.findOneAndUpdate(
+        { token: req.params.token },
+        { avatar: resultCloudinary.secure_url },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        console.error("Erreur lors de la mise à jour de la photo de profil");
+        return res
+          .status(500)
+          .send("Erreur lors de la mise à jour de la photo de profil");
+      }
+
+      // Supprimer le fichier temporaire
+      fs.unlinkSync(photoPath);
+
+      // Renvoyer la réponse avec l'URL de la photo
+      return res.json({ result: true, photoUrl: resultCloudinary.secure_url });
+    } else {
+      // Si le déplacement du fichier a échoué, renvoyer une réponse avec une erreur
+      return res.json({ result: false, error: resultMove });
+    }
+  } catch (err) {
+    // console.error("Erreur:", err);
+    return res.status(500).send("Erreur de serveur");
+  }
 };
