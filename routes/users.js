@@ -8,4 +8,5 @@ router.post("/signin", usersCtrl.signin);
 router.delete("/remove/:token", usersCtrl.remove);
 router.put("/modify/:token", usersCtrl.modify);
 router.get("/print/:token", usersCtrl.print);
+router.post("/addPicture/:token", usersCtrl.addPicture);
 module.exports = router;
