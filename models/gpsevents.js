@@ -6,6 +6,8 @@ const gpseventSchema = mongoose.Schema({
   longitude: Number,
   description: String,
   seats: Number,
+  creator: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
 });
 
 const Gpsevent = mongoose.model("gpsevents", gpseventSchema);
